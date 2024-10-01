@@ -1,0 +1,126 @@
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import praktikum.Bun;
+import praktikum.Burger;
+import praktikum.Ingredient;
+import praktikum.IngredientType;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+public class BurgerTests {
+
+    @Mock
+    private Bun mockBun;
+
+    @Mock
+    private Ingredient mockSauce;
+
+    @Mock
+    private Ingredient mockFilling;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void testAddIngredient() {
+        Burger burger = new Burger();
+        when(mockSauce.getName()).thenReturn("ketchup");
+        when(mockSauce.getPrice()).thenReturn(50f);
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+
+        burger.addIngredient(mockSauce);
+        List<Ingredient> ingredients = burger.ingredients;
+
+        assertTrue("Список ингредиентов должен содержать добавленный ингредиент", ingredients.contains(mockSauce));
+    }
+
+    @Test
+    public void testRemoveIngredient() {
+        Burger burger = new Burger();
+        when(mockSauce.getName()).thenReturn("ketchup");
+        when(mockSauce.getPrice()).thenReturn(50f);
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+
+        burger.addIngredient(mockSauce);
+        burger.removeIngredient(0);
+        List<Ingredient> ingredients = burger.ingredients;
+
+        assertTrue("Список ингредиентов должен быть пустым", ingredients.isEmpty());
+    }
+
+    @Test
+    public void testMoveIngredient() {
+        Burger burger = new Burger();
+        when(mockSauce.getName()).thenReturn("sour cream");
+        when(mockSauce.getPrice()).thenReturn(200f);
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+
+        when(mockFilling.getName()).thenReturn("cutlet");
+        when(mockFilling.getPrice()).thenReturn(100f);
+        when(mockFilling.getType()).thenReturn(IngredientType.FILLING);
+
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
+
+        burger.moveIngredient(0, 1);
+        List<Ingredient> ingredients = burger.ingredients;
+
+        assertEquals("Первый ингредиент должен быть котлета", mockFilling, ingredients.get(0));
+        assertEquals("Второй ингредиент должен быть сметана", mockSauce, ingredients.get(1));
+    }
+
+    @Test
+    public void testGetPrice() {
+        Burger burger = new Burger();
+        when(mockBun.getName()).thenReturn("white bun");
+        when(mockBun.getPrice()).thenReturn(100f);
+
+        when(mockSauce.getName()).thenReturn("hot sauce");
+        when(mockSauce.getPrice()).thenReturn(100f);
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+
+        when(mockFilling.getName()).thenReturn("dinosaur");
+        when(mockFilling.getPrice()).thenReturn(200f);
+        when(mockFilling.getType()).thenReturn(IngredientType.FILLING);
+
+        burger.setBuns(mockBun);
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
+
+        assertEquals("Цена бургера должна быть 500", 500, burger.getPrice(), 0);
+    }
+
+    @Test
+    public void testGetReceipt() {
+        Burger burger = new Burger();
+        when(mockBun.getName()).thenReturn("black bun");
+        when(mockBun.getPrice()).thenReturn(150f);
+
+        when(mockSauce.getName()).thenReturn("chili sauce");
+        when(mockSauce.getPrice()).thenReturn(300f);
+        when(mockSauce.getType()).thenReturn(IngredientType.SAUCE);
+
+        when(mockFilling.getName()).thenReturn("sausage");
+        when(mockFilling.getPrice()).thenReturn(300f);
+        when(mockFilling.getType()).thenReturn(IngredientType.FILLING);
+
+        burger.setBuns(mockBun);
+        burger.addIngredient(mockSauce);
+        burger.addIngredient(mockFilling);
+
+        String expectedReceipt = "(==== black bun ====)\n" +
+                "= sauce chili sauce =\n" +
+                "= filling sausage =\n" +
+                "(==== black bun ====)\n" +
+                "\n" +
+                "Price: 900,000000\n";
+
+        assertEquals("Чек бургера должен быть верным", expectedReceipt, burger.getReceipt());
+    }
+}
